@@ -71,27 +71,23 @@ class FedoraObject:
                 f"and isLiteral as {is_literal}.  Returned {r.status_code}."
             )
 
-    def get_relationships_with_pid(self, pid):
-        r = requests.get(
-            f"{self.fedora_url}/fedora/objects/{pid}/relationships/new?subject=info:fedora/{quote(pid, safe='')}",
-            auth=self.auth,
-        )
-        if r.status_code == 200:
-            return r.status_code
-        else:
-            raise Exception(
-                f"Unable to find relationships to {pid}. Returned {r.status_code}."
-            )
-
     def convert_book_to_compound_object(self, pid):
-        # Remove book content model
+        """Convert a book to a compound object.
+                Args:
+                    pid (str): The persistent identifier to the object where you want to add the relationship.
+                Returns:
+                    int: The status code of the post request.
+                Examples:
+                    >>> FedoraObject().purge_relationship(pid="test:6")
+                        200
+        """
         subject = f'info:fedora/{pid}'
         predicate = 'info:fedora/fedora-system:def/model#hasModel'
-        # Make compound object
+        # Make the object a compound object
         self.add_relationship(pid, subject, predicate, 'info:fedora/islandora:compoundCModel', is_literal=False)
-        # Purge Book
+        # Remove the book type
         self.purge_relationship(pid, subject, predicate, 'info:fedora/islandora:bookCModel', is_literal=False)
-        return
+        return f"{pid} is now a compound object and no longer a book."
 
 
 if __name__ == "__main__":
