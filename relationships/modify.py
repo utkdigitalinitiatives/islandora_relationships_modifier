@@ -144,6 +144,7 @@ class FedoraObject:
     def convert_page_to_part_of_compound_object(self, pid):
         """Convert a page to a large image and part of a compound object"""
         pid_parent = self.get_parent_of_pid(pid)
+        sequence_number = self.get_sequence_number(pid)
         # Wipe out old relationships
         # Add new relationships
         # 1. Make Pid Constituent Of Parent Pid
@@ -155,7 +156,20 @@ class FedoraObject:
             is_literal=False
         )
         # 2. Make a Large Image
-        # 3.
+        self.add_relationship(
+            pid, f'info:fedora/{pid}',
+            'info:fedora/fedora-system:def/model#hasModel',
+            'info:fedora/islandora:sp_large_image_cmodel',
+            is_literal=False
+        )
+        # 3. Add compound sequence relationship
+        self.add_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip()}',
+            obj=sequence_number.rstrip(),
+            is_literal=True
+        )
 
 
 if __name__ == "__main__":
