@@ -165,7 +165,7 @@ class FedoraObject:
         self.add_relationship(
             pid,
             subject=f'info:fedora/{pid}',
-            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip()}',
+            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":","")}',
             obj=sequence_number.rstrip(),
             is_literal=True
         )
@@ -199,7 +199,7 @@ class FedoraObject:
             pid,
             subject=f'info:fedora/{pid}',
             predicate='http://islandora.ca/ontology/relsext#isSectionOf',
-            obj=1,
+            obj="1",
             is_literal=True
         )
         return
