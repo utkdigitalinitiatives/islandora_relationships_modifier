@@ -145,7 +145,6 @@ class FedoraObject:
         """Convert a page to a large image and part of a compound object"""
         pid_parent = self.get_parent_of_pid(pid)
         sequence_number = self.get_sequence_number(pid)
-        # Wipe out old relationships
         # Add new relationships
         # 1. Make Pid Constituent Of Parent Pid
         self.add_relationship(
@@ -170,6 +169,40 @@ class FedoraObject:
             obj=sequence_number.rstrip(),
             is_literal=True
         )
+        # Wipe out old relationships
+        # 1. Remove Page Content Model
+        self.purge_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate='info:fedora/fedora-system:def/model#hasModel',
+            obj='info:fedora/islandora:pageCModel',
+            is_literal=False
+        )
+        # 2. Remove is Page Of
+        self.purge_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate='http://islandora.ca/ontology/relsext#isPageOf',
+            obj=pid_parent.rstrip(),
+            is_literal=False
+        )
+        # 3. Remove is Sequence Number Of
+        self.purge_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate='http://islandora.ca/ontology/relsext#isSequenceNumber',
+            obj=sequence_number.rstrip(),
+            is_literal=True
+        )
+        # 4. Remove is Section Of
+        self.purge_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate='http://islandora.ca/ontology/relsext#isSectionOf',
+            obj=1,
+            is_literal=True
+        )
+        return
 
 
 if __name__ == "__main__":
