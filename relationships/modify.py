@@ -97,6 +97,32 @@ class FedoraObject:
                 f"Unable to find relationships to {pid}. Returned {r.status_code}."
             )
 
+    def get_sequence_number(self, pid):
+        """Find sequence number of pid if it exists.
+        Args:
+            pid (str): The persistent identifier to the object where you want to add the relationship.
+        Returns:
+            str: The sequence number of the requested PID to its parent.
+        Examples:
+            >>> FedoraObject().get_sequence_number('bookColl:296')
+            "63"
+        """
+        r = requests.get(
+            f"{self.fedora_url}/fedora/objects/{pid}/relationships?subject=info:fedora/{quote(pid, safe='')}"
+            f"&predicate={quote('http://islandora.ca/ontology/relsext#isSequenceNumber', safe='')}",
+            auth=self.auth,
+        )
+        if r.status_code == 200:
+            response = r.content.decode("utf-8", "strict")
+            parent = response.split(
+                '<isSequenceNumber xmlns="http://islandora.ca/ontology/relsext#">'
+            )[1].split('</isSequenceNumber>')[0]
+            return parent
+        else:
+            raise Exception(
+                f"Unable to find relationships to {pid}. Returned {r.status_code}."
+            )
+
     def convert_book_to_compound_object(self, pid):
         """Convert a book to a compound object.
         Args:
@@ -133,4 +159,4 @@ class FedoraObject:
 
 
 if __name__ == "__main__":
-    FedoraObject().get_parent_of_pid('bookColl:295')
+    FedoraObject().get_parent_of_pid('bookColl:296')
