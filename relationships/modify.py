@@ -71,15 +71,41 @@ class FedoraObject:
                 f"and isLiteral as {is_literal}.  Returned {r.status_code}."
             )
 
+    def get_parent_of_pid(self, pid):
+        """ Gets the membership of a specific PID.
+        Args:
+            pid (str): The persistent identifier to the object where you want to add the relationship.
+        Returns:
+            str: The persistent identifier of the first object the specified pid belongs to.
+        Examples:
+            >>> FedoraObject().get_parent_of_pid('bookColl:296')
+            "info:fedora/bookColl:295"
+        """
+        r = requests.get(
+            f"{self.fedora_url}/fedora/objects/{pid}/relationships?subject=info:fedora/{quote(pid, safe='')}"
+            f"&predicate={quote('info:fedora/fedora-system:def/relations-external#isMemberOf', safe='')}",
+            auth=self.auth,
+        )
+        if r.status_code == 200:
+            response = r.content.decode("utf-8", "strict")
+            parent = response.split(
+                '<isMemberOf xmlns="info:fedora/fedora-system:def/relations-external#" rdf:resource="'
+            )[1].split('"/>')[0]
+            return parent
+        else:
+            raise Exception(
+                f"Unable to find relationships to {pid}. Returned {r.status_code}."
+            )
+
     def convert_book_to_compound_object(self, pid):
         """Convert a book to a compound object.
                 Args:
                     pid (str): The persistent identifier to the object where you want to add the relationship.
                 Returns:
-                    int: The status code of the post request.
+                    str: A message stating that the request was successful.
                 Examples:
                     >>> FedoraObject().purge_relationship(pid="test:6")
-                        200
+                    'test:6 is now a compound object and no longer a book.'
         """
         subject = f'info:fedora/{pid}'
         predicate = 'info:fedora/fedora-system:def/model#hasModel'
@@ -91,4 +117,4 @@ class FedoraObject:
 
 
 if __name__ == "__main__":
-    FedoraObject().get_relationships_with_pid('bookColl:295')
+    FedoraObject().get_parent_of_pid('bookColl:295')
