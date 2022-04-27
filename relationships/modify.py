@@ -115,6 +115,22 @@ class FedoraObject:
         self.purge_relationship(pid, subject, predicate, 'info:fedora/islandora:bookCModel', is_literal=False)
         return f"{pid} is now a compound object and no longer a book."
 
+    def convert_page_to_part_of_compound_object(self, pid):
+        """Convert a page to a large image and part of a compound object"""
+        pid_parent = self.get_parent_of_pid(pid)
+        # Wipe out old relationships
+        # Add new relationships
+        # 1. Make Pid Constituent Of Parent Pid
+        self.add_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate="info:fedora/fedora-system:def/relations-external#isConstituentOf",
+            obj=pid_parent,
+            is_literal=False
+        )
+        # 2. Make a Large Image
+        # 3.
+
 
 if __name__ == "__main__":
     FedoraObject().get_parent_of_pid('bookColl:295')
