@@ -142,12 +142,18 @@ class FedoraObject:
         return f"{pid} is now a compound object and no longer a book."
 
     def convert_page_to_part_of_compound_object(self, pid):
-        """Convert a page to a large image and part of a compound object"""
+        """Convert a page to a large image and part of a compound object.
+        Args:
+            pid (str): The persistent identifier of the part.
+        Returns:
+            dict: A dict with messaging for each part and whether the operation was successful.
+        """
         pid_parent = self.get_parent_of_pid(pid)
         sequence_number = self.get_sequence_number(pid)
+        message = {}
         # Add new relationships
         # 1. Make Pid Constituent Of Parent Pid
-        self.add_relationship(
+        message['added isConstituentOf'] = self.add_relationship(
             pid,
             subject=f'info:fedora/{pid}',
             predicate="info:fedora/fedora-system:def/relations-external#isConstituentOf",
@@ -155,14 +161,14 @@ class FedoraObject:
             is_literal=False
         )
         # 2. Make a Large Image
-        self.add_relationship(
+        message['converted to large image'] = self.add_relationship(
             pid, f'info:fedora/{pid}',
             'info:fedora/fedora-system:def/model#hasModel',
             'info:fedora/islandora:sp_large_image_cmodel',
             is_literal=False
         )
         # 3. Add compound sequence relationship
-        self.add_relationship(
+        message['added sequence of escaped pid'] = self.add_relationship(
             pid,
             subject=f'info:fedora/{pid}',
             predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":","")}',
@@ -171,7 +177,7 @@ class FedoraObject:
         )
         # Wipe out old relationships
         # 1. Remove Page Content Model
-        self.purge_relationship(
+        message['removed page content model'] = self.purge_relationship(
             pid,
             subject=f'info:fedora/{pid}',
             predicate='info:fedora/fedora-system:def/model#hasModel',
@@ -179,7 +185,7 @@ class FedoraObject:
             is_literal=False
         )
         # 2. Remove is Page Of
-        self.purge_relationship(
+        message['removed isPageOf'] = self.purge_relationship(
             pid,
             subject=f'info:fedora/{pid}',
             predicate='http://islandora.ca/ontology/relsext#isPageOf',
@@ -187,7 +193,7 @@ class FedoraObject:
             is_literal=False
         )
         # 3. Remove is Sequence Number Of
-        self.purge_relationship(
+        message['removed isSequenceNumberOf'] = self.purge_relationship(
             pid,
             subject=f'info:fedora/{pid}',
             predicate='http://islandora.ca/ontology/relsext#isSequenceNumber',
@@ -195,14 +201,14 @@ class FedoraObject:
             is_literal=True
         )
         # 4. Remove is Section Of
-        self.purge_relationship(
+        message['removed isSectionOf'] = self.purge_relationship(
             pid,
             subject=f'info:fedora/{pid}',
             predicate='http://islandora.ca/ontology/relsext#isSectionOf',
             obj="1",
             is_literal=True
         )
-        return
+        return message
 
 
 if __name__ == "__main__":
