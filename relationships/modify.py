@@ -43,21 +43,21 @@ class FedoraObject:
 
     def purge_relationship(self, pid, subject, predicate, obj, is_literal="true"):
         """Purge a relationship to a digital object or datastream.
-                Args:
-                    pid (str): The persistent identifier to the object where you want to add the relationship.
-                    subject (str): The subject of the relationship.  This should refer to the pid (for external relationships)
-                    or the dsid (for internal relationships). For
-                    predicate (str): The predicate of the new relationship.
-                    obj (str): The object of the new relationship.  Can refer to a graph or a literal.
-                    is_literal (str): This defaults to "true" but can also be "false." It specifies whether the object is a graph or a literal.
-                Returns:
-                    int: The status code of the post request.
-                Examples:
-                    >>> FedoraObject().purge_relationship(pid="test:6", subject="info:fedora/test:6",
-                    ... predicate="info:fedora/fedora-system:def/relations-external#isMemberOfCollection",
-                    ... obj="info:fedora/islandora:test", is_literal="false",)
-                    200
-                """
+        Args:
+            pid (str): The persistent identifier to the object where you want to add the relationship.
+            subject (str): The subject of the relationship.  This should refer to the pid (for external relationships)
+            or the dsid (for internal relationships). For
+            predicate (str): The predicate of the new relationship.
+            obj (str): The object of the new relationship.  Can refer to a graph or a literal.
+            is_literal (str): This defaults to "true" but can also be "false." It specifies whether the object is a graph or a literal.
+        Returns:
+            int: The status code of the post request.
+        Examples:
+            >>> FedoraObject().purge_relationship(pid="test:6", subject="info:fedora/test:6",
+            ... predicate="info:fedora/fedora-system:def/relations-external#isMemberOfCollection",
+            ... obj="info:fedora/islandora:test", is_literal="false",)
+            200
+        """
         r = requests.delete(
             f"{self.fedora_url}/fedora/objects/{pid}/relationships?subject={quote(subject, safe='')}"
             f"&predicate={quote(predicate, safe='')}&object={quote(obj, safe='')}&isLiteral={is_literal}",
@@ -99,13 +99,13 @@ class FedoraObject:
 
     def convert_book_to_compound_object(self, pid):
         """Convert a book to a compound object.
-                Args:
-                    pid (str): The persistent identifier to the object where you want to add the relationship.
-                Returns:
-                    str: A message stating that the request was successful.
-                Examples:
-                    >>> FedoraObject().purge_relationship(pid="test:6")
-                    'test:6 is now a compound object and no longer a book.'
+        Args:
+            pid (str): The persistent identifier to the object where you want to add the relationship.
+        Returns:
+            str: A message stating that the request was successful.
+        Examples:
+            >>> FedoraObject().purge_relationship(pid="test:6")
+            'test:6 is now a compound object and no longer a book.'
         """
         subject = f'info:fedora/{pid}'
         predicate = 'info:fedora/fedora-system:def/model#hasModel'
