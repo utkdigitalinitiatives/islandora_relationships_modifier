@@ -22,6 +22,6 @@ if __name__ == "__main__":
             auth=(
                 settings['username'], settings['password']
             )
-        ).convert_page_to_part_of_compound_object(settings.pid)
+        ).convert_page_to_part_of_compound_object(args.pid)
     else:
         print(f'Operation not valid. Unknown model: {args.model}')
