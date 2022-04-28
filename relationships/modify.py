@@ -201,14 +201,22 @@ class FedoraObject:
             is_literal=True
         )
         # 4. Remove is Section Of
-        message['removed isSectionOf'] = self.purge_relationship(
+        message['removed isSection'] = self.purge_relationship(
             pid,
             subject=f'info:fedora/{pid}',
-            predicate='http://islandora.ca/ontology/relsext#isSectionOf',
+            predicate='http://islandora.ca/ontology/relsext#isSection',
             obj="1",
             is_literal=True
         )
         return message
+        # 5. Remove is Page Number
+        message['removed isPageNumber'] = self.purge_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate='http://islandora.ca/ontology/relsext#isPageNumber',
+            obj=sequence_number.rstrip(),
+            is_literal=True
+        )
 
 
 if __name__ == "__main__":
