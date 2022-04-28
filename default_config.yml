@@ -1,0 +1,3 @@
+username: "fedoraAdmin"
+password: "fedoraAdmin"
+fedora_url: "http://localhost:8080"

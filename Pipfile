@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 requests = "*"
+argparse = "*"
+pyyaml = "*"
 
 [dev-packages]
 
