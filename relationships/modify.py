@@ -234,7 +234,6 @@ class FedoraObject:
             obj="1",
             is_literal=True
         )
-        return message
         # 5. Remove is Page Number
         message['removed isPageNumber'] = self.purge_relationship(
             pid,
@@ -243,6 +242,7 @@ class FedoraObject:
             obj=sequence_number.rstrip(),
             is_literal=True
         )
+        return message
 
     def clean_up(self, pid):
         page_number = self.get_page_number(pid)
