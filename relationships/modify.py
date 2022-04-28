@@ -171,7 +171,7 @@ class FedoraObject:
         message['added sequence of escaped pid'] = self.add_relationship(
             pid,
             subject=f'info:fedora/{pid}',
-            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":","")}',
+            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":","_")}',
             obj=sequence_number.rstrip(),
             is_literal=True
         )
