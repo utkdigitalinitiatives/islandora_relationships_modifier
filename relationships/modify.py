@@ -123,6 +123,32 @@ class FedoraObject:
                 f"Unable to find relationships to {pid}. Returned {r.status_code}."
             )
 
+    def get_page_number(self, pid):
+        """Find page number of pid if it exists.
+        Args:
+            pid (str): The persistent identifier to the object where you want to add the relationship.
+        Returns:
+            str: The sequence number of the requested PID to its parent.
+        Examples:
+            >>> FedoraObject().get_page_number('bookColl:296')
+            "63"
+        """
+        r = requests.get(
+            f"{self.fedora_url}/fedora/objects/{pid}/relationships?subject=info:fedora/{quote(pid, safe='')}"
+            f"&predicate={quote('http://islandora.ca/ontology/relsext#isPageNumber', safe='')}",
+            auth=self.auth,
+        )
+        if r.status_code == 200:
+            response = r.content.decode("utf-8", "strict")
+            parent = response.split(
+                '<isPageNumber xmlns="http://islandora.ca/ontology/relsext#">'
+            )[1].split('</isPageNumber>')[0]
+            return parent
+        else:
+            raise Exception(
+                f"Unable to find relationships to {pid}. Returned {r.status_code}."
+            )
+
     def convert_book_to_compound_object(self, pid):
         """Convert a book to a compound object.
         Args:
@@ -217,6 +243,25 @@ class FedoraObject:
             obj=sequence_number.rstrip(),
             is_literal=True
         )
+
+    def clean_up(self, pid):
+        page_number = self.get_page_number(pid)
+        pid_parent = self.get_parent_of_pid(pid)
+        self.add_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":", "_")}',
+            obj=page_number.rstrip(),
+            is_literal=True
+        )
+        self.purge_relationship(
+            pid,
+            subject=f'info:fedora/{pid}',
+            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":", "")}',
+            obj=page_number.rstrip(),
+            is_literal=True
+        )
+        return
 
 
 if __name__ == "__main__":
