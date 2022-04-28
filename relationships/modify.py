@@ -246,18 +246,10 @@ class FedoraObject:
 
     def clean_up(self, pid):
         page_number = self.get_page_number(pid)
-        pid_parent = self.get_parent_of_pid(pid)
-        self.add_relationship(
-            pid,
-            subject=f'info:fedora/{pid}',
-            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":", "_")}',
-            obj=page_number.rstrip(),
-            is_literal=True
-        )
         self.purge_relationship(
             pid,
             subject=f'info:fedora/{pid}',
-            predicate=f'http://islandora.ca/ontology/relsext#isSequenceNumberOf{pid_parent.rstrip().replace("info:fedora/", "").replace(":", "")}',
+            predicate='http://islandora.ca/ontology/relsext#isPageNumber',
             obj=page_number.rstrip(),
             is_literal=True
         )
